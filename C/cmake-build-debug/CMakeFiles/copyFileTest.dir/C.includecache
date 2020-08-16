@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/go0s/Downloads/copyFileTest/main.c
+stdio.h
+-
+string.h
+-
+md5.c
+/Users/go0s/Downloads/copyFileTest/md5.c
+
+/Users/go0s/Downloads/copyFileTest/md5.c
+memory.h
+-
+md5.h
+/Users/go0s/Downloads/copyFileTest/md5.h
+
+/Users/go0s/Downloads/copyFileTest/md5.h
+

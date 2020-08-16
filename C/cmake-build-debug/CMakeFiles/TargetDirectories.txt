@@ -1,0 +1,3 @@
+/Users/go0s/Downloads/copyFileTest/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/go0s/Downloads/copyFileTest/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/go0s/Downloads/copyFileTest/cmake-build-debug/CMakeFiles/copyFileTest.dir
