@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "md5.c"
 
 int encryptFile(char *originalFile, char *secretKey, char *targetFile);
@@ -87,25 +88,8 @@ int encryptFile(char *originalFile, char *secretKey, char *targetFile) {
     FILE *fpOriginal, *fpTarget;  // 要打开的文件的指针
     int readCount,  // 每次从文件中读取的字节数
     i;  // 循环次数
-//    printf("%s", secretKey);
-    unsigned char *encrypt;
-    encrypt = secretKey;
-    unsigned char decrypt[16];
-    MD5_CTX md5;
-    MD5Init(&md5);
-    MD5Update(&md5, encrypt, strlen((char *) encrypt));
-    MD5Final(&md5, decrypt);
-    unsigned char s[128];
-    strcat(s, decrypt);
-    strcat(s, decrypt);
-    strcat(s, decrypt);
-    strcat(s, decrypt);
-    printf("%s", s);
-//    printf("加密前:%s\n加密后:", encrypt);
-//    for (i = 0; i < 16; i++) {
-//        printf("%02x", decrypt[i]);
-//    }
-    int keyLen = strlen(s); // 密钥的长度
+//    int blockNum = 0; // 块编号，++
+    int keyLen = 1024; // 密钥的长度
     char buffer[keyLen];  // 缓冲区，用于存放从文件读取的数据
     // 以二进制方式读取/写入文件
     fpOriginal = fopen(originalFile, "rb");
@@ -118,14 +102,35 @@ int encryptFile(char *originalFile, char *secretKey, char *targetFile) {
         printf("文件[%s]创建/写入失败！请检查文件路径和名称是否输入正确！\n", targetFile);
         return 0;
     }
+    unsigned char *keyTmp;
+    keyTmp = (unsigned char *) malloc(sizeof(char) * 32);
+    strcpy(keyTmp, secretKey);
     // 不断地从文件中读取 keyLen 长度的数据，保存到buffer，直到文件结束
     while ((readCount = fread(buffer, 1, keyLen, fpOriginal)) > 0) {
+//        unsigned char *keyTmp;
+//        keyTmp = (unsigned char *) malloc(sizeof(char) * (strlen(secretKey) + (4 + 1)));
+//        strcat(keyTmp, secretKey);
+//        unsigned char *blockNumTmp;
+//        blockNumTmp = (unsigned char *) malloc(sizeof(char) * 4);
+//        sprintf(blockNumTmp, "%d", blockNum);
+//        strcat(keyTmp, blockNumTmp);
+        unsigned char encryptMD5[32];
+        MD5_CTX md5;
+        MD5Init(&md5);
+        MD5Update(&md5, keyTmp, strlen((char *) keyTmp));
+        MD5Final(&md5, encryptMD5);
         // 对buffer中的数据逐字节进行异或运算
         for (i = 0; i < readCount; i++) {
-            buffer[i] ^= s[i];
+            buffer[i] ^= encryptMD5[i];
         }
+        free(keyTmp);
+        // 替换key，下一轮重新MD5
+        keyTmp = (unsigned char *) malloc(sizeof(char) * 32);
+        strcpy(keyTmp, encryptMD5);
         // 将buffer中的数据写入文件
         fwrite(buffer, 1, readCount, fpTarget);
+//        free(blockNumTmp);
+//        blockNum++;
     }
     fclose(fpOriginal);
     fclose(fpTarget);
