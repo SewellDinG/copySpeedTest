@@ -10,11 +10,15 @@
 
 耗时情况：Mac（Linux）下使用time命令、Windows下使用Powershell的Measure-Command{}。
 
+P.s：同时使用OpenSSL的RC4和AES-256-CBC作对比。
+
 ## 测试结果
 
 ![大文件拷贝情况对比图](./大文件拷贝情况对比图（Golang版）.png)
 
 ![大文件拷贝情况对比图](./大文件拷贝情况对比图（C语言版）.png)
+
+![大文件拷贝情况对比图](./大文件拷贝情况对比图.png)
 
 详见Excel文件，结论很明显。
 
@@ -202,5 +206,26 @@ cp Original Target  0.95s user 215.42s system 8% cpu 42:10.57 total
 ➜  time ./copyFileTest 1 Original Target thisiskey
 恭喜你，文件[Original]加密成功，保存在[Target]。
 ./copyFileTest 1 Original Target thisiskey  747.91s user 349.37s system 37% cpu 48:37.73 total
+```
+
+### OpenSSL
+
+目标：200G大小的随机数文件。
+
+环境：Mac+海康威视的SSD。
+
+测试过程：
+
+```
+[zzz]: /Volumes/HIKVISION
+➜  time openssl enc -aes-256-cbc -in Original -out Target -K 7468697369736b6579 -iv 7468697369736976
+openssl enc -aes-256-cbc -in Original -out Target -K 7468697369736b6579 -iv   356.59s user 176.99s system 20% cpu 44:17.75 total
+注：
+7468697369736b6579 -> thisiskey的hex值
+7468697369736976 -> thisisiv的hex值
+
+[zzz]: /Volumes/HIKVISION
+➜  time openssl enc -rc4 -in Original -out Target -K 7468697369736b6579
+openssl enc -rc4 -in Original -out Target -K 7468697369736b6579  537.63s user 159.88s system 25% cpu 44:45.18 total
 ```
 
